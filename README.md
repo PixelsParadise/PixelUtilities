@@ -1,2 +1,2 @@
 # pixelparadise
-All Bots used for Pixel Paradise
+this is a utility bot made for the server Pixel Paradise if you want to use it feel free to download and use the scripts made! just add your token to the config.json file in the root dir and staff roles and the bot will work perfectly with no issues. Feel free to rename it to whatever you like.
