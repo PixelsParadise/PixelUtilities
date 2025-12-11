@@ -1,0 +1,39 @@
+{
+  "token": "",
+  "prefix": "!",
+  "owner_id": "",
+  "activity": {
+    "type": "playing",
+    "name": "Pixel Paradise"
+  },
+  "colors": {
+    "success": "#00ff00",
+    "error": "#ff0000",
+    "info": "#0099ff"
+  },
+  "settings": {
+    "log_channel_id": "",
+    "audit_channel_id": "",
+    "auto_role_id": null,
+    "ticket_category_id": "",
+    "transcript_channel_id": "",
+    "reports_channel_id": ""
+  },
+  "staff_roles": {
+    "Administrator": [
+      1440731529226616952
+    ],
+    "Lead Moderator": [
+      1440731502223560754
+    ],
+    "Chat Moderator": [
+      1440731564995641565
+    ],
+    "Head Administrator": [
+      1446199431316766753
+    ],
+    "Management": [
+      1440731472423026829
+    ]
+  }
+}
