@@ -1,10 +1,10 @@
 {
-  "token": "",
+  "token": "MTQ0NzY5NjEwNDAyNzA2NjQyMQ.GEoIxH.Atm_XMjEw22iHmFZ6b2BVFa4pMWKNxJyWFzPoA",
   "prefix": "!",
-  "owner_id": "",
+  "owner_id": "1148246762860056598",
   "activity": {
-    "type": "playing",
-    "name": "Pixel Paradise"
+    "type": "Playing",
+    "name": "Bot Version = 1.2.2"
   },
   "colors": {
     "success": "#00ff00",
@@ -12,16 +12,18 @@
     "info": "#0099ff"
   },
   "settings": {
-    "log_channel_id": "",
-    "audit_channel_id": "",
+    "log_channel_id": "1442649327062351973",
+    "audit_channel_id": "1442647751472189470",
     "auto_role_id": null,
-    "ticket_category_id": "",
-    "transcript_channel_id": "",
-    "reports_channel_id": ""
+    "ticket_category_id": "1448722615673028800",
+    "transcript_channel_id": "1440801811194707978",
+    "premium_ticket_category_id": "1449591169561399306",
+    "premium_transcript_channel_id": "1449591170693857291",
+    "reports_channel_id": "1448858905491935394"
   },
   "staff_roles": {
     "Administrator": [
-      1440731529226616952
+      11440731529226616952
     ],
     "Lead Moderator": [
       1440731502223560754
@@ -34,6 +36,21 @@
     ],
     "Management": [
       1440731472423026829
+    ]
+  },
+  "premium_roles": {
+    "tier1": [
+      1448843687823020153,
+      "1448843687823020153",
+      "1448833642435711017"
+    ],
+    "tier2": [
+      1448843365201215623,
+      "1448843365201215623"
+    ],
+    "tier3": [
+      1448833642435711017,
+      "1448843687823020153"
     ]
   }
 }
