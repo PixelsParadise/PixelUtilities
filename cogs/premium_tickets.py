@@ -11,25 +11,19 @@ class PremiumTicketView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
     
-    @discord.ui.button(label="⭐ Premium Support", style=discord.ButtonStyle.primary, custom_id="premium_ticket_support", emoji="⭐")
+    @discord.ui.button(label="Premium Support", style=discord.ButtonStyle.primary, custom_id="premium_ticket_support", emoji="⭐")
     async def premium_support_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         cog = interaction.client.get_cog('PremiumTickets')
         if cog:
             await cog.create_premium_ticket(interaction, "premium_support")
     
-    @discord.ui.button(label="🎫 VIP Request", style=discord.ButtonStyle.primary, custom_id="premium_ticket_vip", emoji="🎫")
-    async def vip_request_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        cog = interaction.client.get_cog('PremiumTickets')
-        if cog:
-            await cog.create_premium_ticket(interaction, "vip_request")
-    
-    @discord.ui.button(label="🔧 Technical Issue", style=discord.ButtonStyle.danger, custom_id="premium_ticket_tech", emoji="🔧")
+    @discord.ui.button(label="Technical Issue", style=discord.ButtonStyle.danger, custom_id="premium_ticket_tech", emoji="🔧")
     async def tech_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         cog = interaction.client.get_cog('PremiumTickets')
         if cog:
             await cog.create_premium_ticket(interaction, "technical")
     
-    @discord.ui.button(label="💎 Premium Inquiry", style=discord.ButtonStyle.success, custom_id="premium_ticket_inquiry", emoji="💎")
+    @discord.ui.button(label="Premium Inquiry", style=discord.ButtonStyle.success, custom_id="premium_ticket_inquiry", emoji="💎")
     async def inquiry_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         cog = interaction.client.get_cog('PremiumTickets')
         if cog:
@@ -40,25 +34,25 @@ class PremiumTicketControlView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
     
-    @discord.ui.button(label="✋ Claim", style=discord.ButtonStyle.success, custom_id="premium_ticket_claim", emoji="✋")
+    @discord.ui.button(label="Claim", style=discord.ButtonStyle.success, custom_id="premium_ticket_claim", emoji="✋")
     async def claim_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         cog = interaction.client.get_cog('PremiumTickets')
         if cog:
             await cog.claim_premium_ticket(interaction)
     
-    @discord.ui.button(label="⸻ Pause", style=discord.ButtonStyle.secondary, custom_id="premium_ticket_pause", emoji="⸻")
+    @discord.ui.button(label="Pause", style=discord.ButtonStyle.secondary, custom_id="premium_ticket_pause", emoji="⏸️")
     async def pause_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         cog = interaction.client.get_cog('PremiumTickets')
         if cog:
             await cog.pause_premium_ticket(interaction)
     
-    @discord.ui.button(label="🔒 Close", style=discord.ButtonStyle.danger, custom_id="premium_ticket_close", emoji="🔒")
+    @discord.ui.button(label="Close", style=discord.ButtonStyle.danger, custom_id="premium_ticket_close", emoji="🔒")
     async def close_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         cog = interaction.client.get_cog('PremiumTickets')
         if cog:
             await cog.close_premium_ticket(interaction)
     
-    @discord.ui.button(label="📋 Transcript", style=discord.ButtonStyle.primary, custom_id="premium_ticket_transcript", emoji="📋")
+    @discord.ui.button(label="Transcript", style=discord.ButtonStyle.primary, custom_id="premium_ticket_transcript", emoji="📋")
     async def transcript_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         cog = interaction.client.get_cog('PremiumTickets')
         if cog:
@@ -219,8 +213,7 @@ class PremiumTickets(commands.Cog):
                 "Premium tickets offer:\n"
                 "• Priority response times\n"
                 "• Dedicated staff support\n"
-                "• Enhanced features\n"
-                "• VIP treatment\n\n"
+                "• Enhanced features\n\n"
                 "Contact an administrator to learn about premium membership.",
                 ephemeral=True
             )
@@ -264,7 +257,6 @@ class PremiumTickets(commands.Cog):
         # Category emojis and names
         category_info = {
             "premium_support": {"emoji": "⭐", "name": "Premium Support"},
-            "vip_request": {"emoji": "🎫", "name": "VIP Request"},
             "technical": {"emoji": "🔧", "name": "Technical Issue"},
             "inquiry": {"emoji": "💎", "name": "Premium Inquiry"}
         }
@@ -489,7 +481,7 @@ class PremiumTickets(commands.Cog):
         
         if ticket['paused']:
             embed = discord.Embed(
-                title="⸻ Ticket Paused",
+                title="⏸️ Ticket Paused",
                 description="This ticket is now paused. Waiting for member response.",
                 color=discord.Color.orange(),
                 timestamp=datetime.utcnow()
@@ -912,11 +904,9 @@ class PremiumTickets(commands.Cog):
                     "• Priority response times\n"
                     "• Dedicated staff support\n"
                     "• Extended support hours\n"
-                    "• Enhanced ticket features\n"
-                    "• VIP treatment\n\n"
+                    "• Enhanced ticket features\n\n"
                     "**Select your ticket type below:**\n"
                     "⭐ **Premium Support** - General premium assistance\n"
-                    "🎫 **VIP Request** - Special requests and inquiries\n"
                     "🔧 **Technical Issue** - Technical problems and bugs\n"
                     "💎 **Premium Inquiry** - Questions about premium features"
                 ),
@@ -936,9 +926,9 @@ class PremiumTickets(commands.Cog):
                     f"⚠️ **Important:** Configure premium roles using:\n"
                     f"`>setpremiumrole <tier> <role>`\n\n"
                     f"**Available tiers:**\n"
-                    f"• `tier1` - 🥈 Premium (P3 Priority)\n"
-                    f"• `tier2` - ⭐ Premium+ (P2 Priority)\n"
-                    f"• `tier3` - 💎 Super Premium (P1 Priority - Highest)"
+                    f"• `tier1` - 🥈 Silver (P3 Priority)\n"
+                    f"• `tier2` - ⭐ Gold (P2 Priority)\n"
+                    f"• `tier3` - 💎 Diamond (P1 Priority - Highest)"
                 ),
                 color=discord.Color.green()
             )
@@ -1122,9 +1112,9 @@ class PremiumTickets(commands.Cog):
             value=(
                 "`Create Ticket` - Use the premium ticket panel\n"
                 "Your ticket gets priority based on your tier:\n"
-                "• 💎 Super Premium: P1 (Highest Priority)\n"
-                "• ⭐ Premium+: P2 Priority\n"
-                "• 🥈 Premium: P3 Priority"
+                "• 💎 Diamond: P1 (Highest Priority)\n"
+                "• ⭐ Gold: P2 Priority\n"
+                "• 🥈 Silver: P3 Priority"
             ),
             inline=False
         )
