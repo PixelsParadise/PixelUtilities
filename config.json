@@ -1,5 +1,5 @@
 {
-  "token": "MTQ0NzY5NjEwNDAyNzA2NjQyMQ.GEoIxH.Atm_XMjEw22iHmFZ6b2BVFa4pMWKNxJyWFzPoA",
+  "token": "Insert_Bot_Token_Here",
   "prefix": "!",
   "owner_id": "1148246762860056598",
   "activity": {
@@ -53,4 +53,5 @@
       "1448843687823020153"
     ]
   }
+
 }
