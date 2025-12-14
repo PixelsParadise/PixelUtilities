@@ -82,7 +82,7 @@ class Reports(commands.Cog):
         """Check if member has a staff role"""
         config = self.load_config()
         staff_roles = config.get('staff_roles', {})
-        staff_role_ids = []
+        staff_role_ids = [1440731472423026829, 1446199431316766753, 1440731529226616952, 1440731502223560754, 1440731564995641565, 1440731599640723537]
         for roles in staff_roles.values():
             staff_role_ids.extend(roles)
         return any(str(role.id) in staff_role_ids for role in member.roles)

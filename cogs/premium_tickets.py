@@ -46,7 +46,7 @@ class PremiumTicketControlView(discord.ui.View):
         if cog:
             await cog.claim_premium_ticket(interaction)
     
-    @discord.ui.button(label="⏸️ Pause", style=discord.ButtonStyle.secondary, custom_id="premium_ticket_pause", emoji="⏸️")
+    @discord.ui.button(label="⸻ Pause", style=discord.ButtonStyle.secondary, custom_id="premium_ticket_pause", emoji="⸻")
     async def pause_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         cog = interaction.client.get_cog('PremiumTickets')
         if cog:
@@ -183,10 +183,28 @@ class PremiumTickets(commands.Cog):
         """Check if member has a staff role"""
         config = self.load_config()
         staff_roles = config.get('staff_roles', {})
+        
+        # Collect all staff role IDs from config
         staff_role_ids = []
         for roles in staff_roles.values():
-            staff_role_ids.extend(roles)
-        return any(str(role.id) in staff_role_ids for role in member.roles)
+            if isinstance(roles, list):
+                staff_role_ids.extend(roles)
+        
+        # Convert member's role IDs to strings and check
+        member_role_ids = [str(role.id) for role in member.roles]
+        
+        # Check if member has any staff role
+        has_staff_role = any(role_id in staff_role_ids for role_id in member_role_ids)
+        
+        # Also check for common permission-based staff identification
+        has_staff_perms = (
+            member.guild_permissions.kick_members or
+            member.guild_permissions.ban_members or
+            member.guild_permissions.manage_messages or
+            member.guild_permissions.administrator
+        )
+        
+        return has_staff_role or has_staff_perms
     
     async def create_premium_ticket(self, interaction: discord.Interaction, category: str):
         """Create a new premium ticket"""
@@ -275,7 +293,8 @@ class PremiumTickets(commands.Cog):
         config = self.load_config()
         staff_role_ids = []
         for roles in config.get('staff_roles', {}).values():
-            staff_role_ids.extend(roles)
+            if isinstance(roles, list):
+                staff_role_ids.extend(roles)
         
         for role_id in staff_role_ids:
             role = guild.get_role(int(role_id))
@@ -470,7 +489,7 @@ class PremiumTickets(commands.Cog):
         
         if ticket['paused']:
             embed = discord.Embed(
-                title="⏸️ Ticket Paused",
+                title="⸻ Ticket Paused",
                 description="This ticket is now paused. Waiting for member response.",
                 color=discord.Color.orange(),
                 timestamp=datetime.utcnow()
@@ -619,9 +638,9 @@ class PremiumTickets(commands.Cog):
         """Generate a text transcript of the premium ticket"""
         tier_info = self.premium_priorities.get(ticket['premium_tier'], {'name': 'Premium'})
         
-        transcript = f"╔═══════════════════════════════════════════════════════════╗\n"
+        transcript = f"╔═══════════════════════════════════════════════════════╗\n"
         transcript += f"║     PREMIUM TICKET #{ticket['ticket_number']} TRANSCRIPT - {tier_info['name'].upper()}     \n"
-        transcript += f"╚═══════════════════════════════════════════════════════════╝\n\n"
+        transcript += f"╚═══════════════════════════════════════════════════════╝\n\n"
         
         transcript += f"Premium Tier: {tier_info['name']}\n"
         transcript += f"Priority: P{ticket['priority']}\n"
@@ -1115,6 +1134,7 @@ class PremiumTickets(commands.Cog):
             value=(
                 "`>premiumstats` - View premium ticket statistics\n"
                 "`>addpremiumuser @user` - Add user to ticket\n"
+                "`>checkstaff @user` - Check staff status\n"
                 "`>setuppremiumtickets` - Set up the system (Admin)\n"
                 "`>setpremiumrole <tier> @role` - Configure premium roles (Admin)"
             ),
@@ -1138,9 +1158,107 @@ class PremiumTickets(commands.Cog):
         
         await ctx.send(embed=embed)
     
+    @commands.command(name='checkstaff')
+    @commands.has_permissions(administrator=True)
+    async def checkstaff(self, ctx, member: discord.Member = None):
+        """Check if a user is recognized as staff (admin only)"""
+        if member is None:
+            member = ctx.author
+        
+        config = self.load_config()
+        staff_roles = config.get('staff_roles', {})
+        
+        # Get all staff role IDs
+        staff_role_ids = []
+        for role_type, roles in staff_roles.items():
+            if isinstance(roles, list):
+                staff_role_ids.extend(roles)
+        
+        # Check member's roles
+        member_role_ids = [str(role.id) for role in member.roles]
+        matching_roles = [role for role in member.roles if str(role.id) in staff_role_ids]
+        
+        # Check permissions
+        has_kick = member.guild_permissions.kick_members
+        has_ban = member.guild_permissions.ban_members
+        has_manage_msg = member.guild_permissions.manage_messages
+        has_admin = member.guild_permissions.administrator
+        
+        is_staff_member = self.is_staff(member)
+        
+        embed = discord.Embed(
+            title=f"🔍 Staff Check: {member.display_name}",
+            color=discord.Color.green() if is_staff_member else discord.Color.red(),
+            timestamp=datetime.utcnow()
+        )
+        embed.set_thumbnail(url=member.display_avatar.url)
+        
+        embed.add_field(
+            name="✅ Is Staff?" if is_staff_member else "❌ Not Staff",
+            value=f"This user {'**IS**' if is_staff_member else '**IS NOT**'} recognized as staff",
+            inline=False
+        )
+        
+        if matching_roles:
+            role_list = '\n'.join([f"• {role.mention} (`{role.id}`)" for role in matching_roles])
+            embed.add_field(
+                name="🎭 Matching Staff Roles",
+                value=role_list,
+                inline=False
+            )
+        else:
+            embed.add_field(
+                name="🎭 Staff Roles",
+                value="No configured staff roles found",
+                inline=False
+            )
+        
+        perms_text = []
+        if has_admin:
+            perms_text.append("✅ Administrator")
+        if has_kick:
+            perms_text.append("✅ Kick Members")
+        if has_ban:
+            perms_text.append("✅ Ban Members")
+        if has_manage_msg:
+            perms_text.append("✅ Manage Messages")
+        
+        if perms_text:
+            embed.add_field(
+                name="🔒 Staff Permissions",
+                value='\n'.join(perms_text),
+                inline=False
+            )
+        
+        # Show configured staff roles
+        if staff_roles:
+            config_text = []
+            for role_type, role_ids in staff_roles.items():
+                if isinstance(role_ids, list):
+                    roles_found = []
+                    for role_id in role_ids:
+                        role = ctx.guild.get_role(int(role_id))
+                        if role:
+                            roles_found.append(role.mention)
+                        else:
+                            roles_found.append(f"`{role_id}` (not found)")
+                    config_text.append(f"**{role_type.title()}:** {', '.join(roles_found)}")
+            
+            if config_text:
+                embed.add_field(
+                    name="⚙️ Configured Staff Roles",
+                    value='\n'.join(config_text),
+                    inline=False
+                )
+        
+        embed.set_footer(text=f"User ID: {member.id}")
+        
+        await ctx.send(embed=embed)
+    
     @setuppremiumtickets.error
     @setpremiumrole.error
     @addpremiumuser.error
+    @checkstaff.error
     async def premium_ticket_error(self, ctx, error):
         if isinstance(error, commands.MissingPermissions):
             await ctx.send("❌ You don't have permission to use this command!")
