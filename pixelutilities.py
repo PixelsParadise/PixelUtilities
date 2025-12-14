@@ -72,17 +72,20 @@ async def on_message(message):
     if message.author == bot.user:
         return
     
-    # Process commands (important if you want commands to work)
-    await bot.process_commands(message)
+    # Process commands and get the context
+    ctx = await bot.get_context(message)
     
-    # Delete the user's message if it was a command
-    if message.content.startswith(bot.command_prefix):
+    # Only delete if it was a valid command
+    if ctx.valid and ctx.command is not None:
         try:
             await message.delete()
         except discord.Forbidden:
             pass  # Bot doesn't have permission to delete messages
         except discord.HTTPException:
             pass  # Message already deleted or other error
+    
+    # Continue processing commands
+    await bot.process_commands(message)
 
 # Load all cogs (command files)
 async def load_cogs():
