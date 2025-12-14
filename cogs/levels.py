@@ -352,16 +352,16 @@ class Levels(commands.Cog):
             
             member = ctx.guild.get_member(int(user_id))
             if member:
-                name = member.display_name
+                user_mention = member.mention
             else:
-                name = f"User {user_id}"
+                user_mention = f"<@{user_id}>"
             
             level = data['level']
             total_xp = data['total_xp']
             messages = data['messages']
             
             leaderboard_text.append(
-                f"{medal} **{name}**\n"
+                f"{medal} {user_mention}\n"
                 f"    Level {level} • {total_xp:,} XP • {messages:,} msgs"
             )
         

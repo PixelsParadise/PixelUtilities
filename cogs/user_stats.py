@@ -24,7 +24,8 @@ class UserStats(commands.Cog):
             'mute': -3,
             'kick': -4,
             'ban': -5,
-            'ticket_created': 2  # Positive points for creating tickets (getting help)
+            'ticket_created': 2,  # Positive points for creating tickets (getting help)
+            'messages_per_point': 3  # 1 point for every 3 messages
         }
         
         # Level milestone rewards (from levels.py)
@@ -87,7 +88,7 @@ class UserStats(commands.Cog):
         }
     
     def calculate_points(self, infractions):
-        """Calculate total points based on infractions and level"""
+        """Calculate total points based on infractions, messages, and level"""
         total_points = 0
         
         # Negative points for infractions
@@ -98,6 +99,10 @@ class UserStats(commands.Cog):
         
         # Positive points for tickets
         total_points += infractions['tickets'] * self.points_config['ticket_created']
+        
+        # NEW: Points for messages (1 point per 3 messages)
+        message_points = infractions['messages'] // self.points_config['messages_per_point']
+        total_points += message_points
         
         # Add level milestone points
         level = infractions.get('level', 0)
@@ -137,6 +142,9 @@ class UserStats(commands.Cog):
         # Get rank
         rank, color = self.get_rank(total_points)
         
+        # Calculate message points
+        message_points = infractions['messages'] // self.points_config['messages_per_point']
+        
         # Create embed
         embed = discord.Embed(
             title=f"📊 User Statistics for {member.display_name}",
@@ -165,7 +173,7 @@ class UserStats(commands.Cog):
         # Activity stats
         embed.add_field(
             name="💬 Activity",
-            value=f"**{infractions['messages']:,}** messages\n**{infractions['total_xp']:,}** total XP",
+            value=f"**{infractions['messages']:,}** messages\n**{message_points}** pts from messages\n**{infractions['total_xp']:,}** total XP",
             inline=True
         )
         embed.add_field(name="\u200b", value="\u200b", inline=True)  # Spacer
@@ -208,6 +216,7 @@ class UserStats(commands.Cog):
                 f"Kick: {self.points_config['kick']} | "
                 f"Ban: {self.points_config['ban']}\n"
                 f"**Positive:** Ticket: +{self.points_config['ticket_created']} | "
+                f"Messages: +1 per {self.points_config['messages_per_point']} msgs | "
                 f"Level Milestones: up to +{sum(self.level_points.values())} pts"
             ),
             inline=False
@@ -280,7 +289,8 @@ class UserStats(commands.Cog):
                 member = stats['member']
                 
                 if mode == 'points':
-                    value = f"{stats['points']} points (Level {stats['infractions']['level']})"
+                    msg_pts = stats['infractions']['messages'] // self.points_config['messages_per_point']
+                    value = f"{stats['points']} points (Level {stats['infractions']['level']}, {msg_pts} from msgs)"
                 elif mode == 'level':
                     value = f"Level {stats['infractions']['level']} ({stats['infractions']['total_xp']:,} XP)"
                 else:
@@ -319,6 +329,7 @@ class UserStats(commands.Cog):
                     f"**Current Stats:**\n"
                     f"Points: {points}\n"
                     f"Level: {infractions['level']}\n"
+                    f"Messages: {infractions['messages']}\n"
                     f"Warnings: {infractions['warns']}\n"
                     f"Mutes: {infractions['mutes']}\n"
                     f"Kicks: {infractions['kicks']}\n"
@@ -375,6 +386,7 @@ class UserStats(commands.Cog):
             value=(
                 f"Points: **{points}**\n"
                 f"Level: {infractions['level']}\n"
+                f"Messages: {infractions['messages']}\n"
                 f"Warnings: {infractions['warns']}\n"
                 f"Mutes: {infractions['mutes']}\n"
                 f"Kicks: {infractions['kicks']}\n"
@@ -417,7 +429,10 @@ class UserStats(commands.Cog):
         
         embed.add_field(
             name="Positive Actions",
-            value=f"🎫 Ticket Created: **+{self.points_config['ticket_created']}** points",
+            value=(
+                f"🎫 Ticket Created: **+{self.points_config['ticket_created']}** points\n"
+                f"💬 Messages: **+1** point per **{self.points_config['messages_per_point']}** messages"
+            ),
             inline=False
         )
         
@@ -457,10 +472,12 @@ class UserStats(commands.Cog):
         infractions1 = self.count_infractions(ctx.guild.id, member1.id)
         points1 = self.calculate_points(infractions1)
         rank1, color1 = self.get_rank(points1)
+        msg_pts1 = infractions1['messages'] // self.points_config['messages_per_point']
         
         infractions2 = self.count_infractions(ctx.guild.id, member2.id)
         points2 = self.calculate_points(infractions2)
         rank2, color2 = self.get_rank(points2)
+        msg_pts2 = infractions2['messages'] // self.points_config['messages_per_point']
         
         # Determine winner
         if points1 > points2:
@@ -488,6 +505,7 @@ class UserStats(commands.Cog):
                 f"**Points:** {points1}\n"
                 f"**Rank:** {rank1}\n"
                 f"**Level:** {infractions1['level']}\n"
+                f"**Messages:** {infractions1['messages']:,} (+{msg_pts1} pts)\n"
                 f"Warns: {infractions1['warns']} | "
                 f"Mutes: {infractions1['mutes']} | "
                 f"Kicks: {infractions1['kicks']} | "
@@ -503,6 +521,7 @@ class UserStats(commands.Cog):
                 f"**Points:** {points2}\n"
                 f"**Rank:** {rank2}\n"
                 f"**Level:** {infractions2['level']}\n"
+                f"**Messages:** {infractions2['messages']:,} (+{msg_pts2} pts)\n"
                 f"Warns: {infractions2['warns']} | "
                 f"Mutes: {infractions2['mutes']} | "
                 f"Kicks: {infractions2['kicks']} | "
