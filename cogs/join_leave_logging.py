@@ -457,7 +457,7 @@ class JoinLeaveLogging(commands.Cog):
         
         await channel.send(embed=test_embed)
     
-    @commands.command(name='rolehistory', aliases=['roles', 'previousroles'])
+    @commands.command(name='rolehistory', aliases=['previousroles', 'rh'])
     @commands.has_permissions(kick_members=True)
     async def rolehistory(self, ctx, member: discord.Member = None):
         """View a user's role history (shows roles they had when they last left)"""
